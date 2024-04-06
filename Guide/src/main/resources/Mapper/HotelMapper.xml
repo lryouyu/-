@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ysu.dao.HotelMapper">
+    <resultMap id="hotelMap" type="hotel">
+        <id column="id" property="id"/>
+        <result column="hotel_name" property="hotelName"/>
+        <result column="address" property="address"/>
+        <result column="content" property="content"/>
+        <result column="score" property="score"/>
+        <result column="tel" property="tel"/>
+    </resultMap>
+    <resultMap id="houseMap" type="house">
+        <id column="id" property="id"/>
+        <result column="house_name" property="houseName"/>
+        <result column="cost" property="cost"/>
+        <result column="hotel_id" property="hotelId"/>
+        <result column="person_count" property="personCount"/>
+        <result column="num" property="num"/>
+        <result column="introduce" property="introduce"/>
+    </resultMap>
+    <resultMap id="orderMap" type="order">
+        <id column="id" property="id"/>
+        <result column="time" property="time"/>
+        <result column="in_time" property="inTime"/>
+        <result column="out_time" property="outTime"/>
+        <result column="house_id" property="houseId"/>
+        <result column="hotel_name" property="hotelName"/>
+        <result column="house_name" property="houseName"/>
+        <result column="user_id" property="userId"/>
+        <result column="cost" property="cost"/>
+        <result property="username" column="username"/>
+    </resultMap>
+    <resultMap id="imgMap" type="hotelImage">
+        <id column="id" property="id"/>
+        <result column="img_path" property="imgPath"/>
+        <result column="hotel_id" property="hotelId"/>
+    </resultMap>
+    <select id="selectListHotel" resultMap="hotelMap">
+        select *
+        from `hotel`;
+    </select>
+    <select id="selectListOrder" resultMap="orderMap">
+        select *
+        from `order`;
+    </select>
+    <select id="selectListOrderByUserId" resultMap="orderMap">
+        select * from `order` where user_id =#{userId}
+    </select>
+    <select id="selectListOrderByHouseId" resultMap="orderMap">
+        select * from `order` where house_id = #{houseId}
+    </select>
+    <select id="selectByName" resultMap="hotelMap">
+        select *
+        from `hotel`
+        where `hotel_name` like concat('%', #{hotelName}, '%') OR `address` LIKE concat('%', #{hotelName}, '%')
+    </select>
+    <select id="selectHotelById" resultMap="hotelMap">
+        select *
+        from `hotel`
+        where id = #{id}
+    </select>
+    <select id="selectImgByAttId" resultMap="imgMap">
+        select * from `hotel_image` where hotel_id=#{hotelId}
+    </select>
+    <update id="updateHotel">
+        update `hotel`
+        <set>
+            <if test="hotelName!=null and hotelName!=''">
+                `hotel_name`=#{hotelName},
+            </if>
+            <if test="address!=null and address!=''">
+                `address`=#{address},
+            </if>
+            <if test="score!=null and score!=''">
+                `score`=#{score},
+            </if>
+            <if test="tel!=null and tel!=''">
+                `tel`=#{tel},
+            </if>
+        </set>
+        <where>
+            <if test="id!=null and id>0">
+                `id`=#{id}
+            </if>
+        </where>
+    </update>
+
+    <update id="updateHouse">
+        update `house`
+        <set>
+            <if test="houseName!=null and houseName!=''">
+                `house_name`=#{houseName},
+            </if>
+            <if test="cost!=null and cost!=''">
+                `cost`=#{cost},
+            </if>
+            <if test="personCount!=null and personCount!=''">
+                `person_count`=#{personCount},
+            </if>
+            <if test="num!=null and num!=''">
+                `num`=#{num},
+            </if>
+            <if test="introduce!=null and introduce!=''">
+                `introduce`=#{introduce},
+            </if>
+        </set>
+        <where>
+            <if test="id!=null and id>0">
+                `id`=#{id}
+            </if>
+        </where>
+    </update>
+
+
+
+    <update id="updateImage">
+        update `hotel_image`
+        <set>
+            <if test="imgPath!=null and imgPath!=''">
+                `img_path`=#{imgPath},
+            </if>
+        </set>
+        <where>
+            `id`=#{id}
+        </where>
+    </update>
+
+    <delete id="deleteHotelById">
+        delete from `hotel` where id = #{id}
+    </delete>
+
+    <delete id="deleteHouseById">
+        delete from `house` where id = #{id}
+    </delete>
+
+    <insert id="insertHotel" useGeneratedKeys="true" keyProperty="id">
+        insert into `hotel`(`hotel_name`,`address`,`content`,`score`,`tel`)
+        values (#{hotelName},#{address},#{content},#{score},#{tel})
+    </insert>
+    <insert id="insertHouse" useGeneratedKeys="true" keyProperty="id">
+        insert into `house`(`house_name`,`cost`,`hotel_id`,`person_count`,`num`,`introduce`)
+        values (#{houseName},#{cost},#{hotelId},#{personCount},#{num},#{introduce})
+    </insert>
+
+    <insert id="insertImage" useGeneratedKeys="true" keyProperty="id">
+        insert into `hotel_image`(`img_path`,`hotel_id`)
+        values (#{imgPath},#{hotelId})
+    </insert>
+
+    <select id="countHouse" resultMap="houseMap">
+        select * from `house` where hotel_id = #{hotelId}
+    </select>
+
+
+    <insert id="insertOrder" useGeneratedKeys="true" keyProperty="id">
+        insert into `order`(`time`,`in_time`,`out_time`,`house_id`,`user_id`,`cost`,`username`,`house_name`,`hotel_name`)
+        values (#{time},#{inTime},#{outTime},#{houseId},#{userId},#{cost},#{username},#{houseName},#{hotelName})
+    </insert>
+
+    <select id="selectByUserId" resultMap="orderMap">
+        select * from `order` where user_id = #{userId}
+    </select>
+
+    <update id="updateOrder">
+        update `order`
+        <set>
+            <if test="inTime!=null and inTime!=''">
+                `inTime`=#{inTime},
+            </if>
+            <if test="outTime!=null and outTime!=''">
+                `outTime`=#{outTime},
+            </if>
+            <if test="houseId!=null and houseId!=''">
+                `house_id`=#{houseId},
+            </if>
+            <if test="userId!=null and userId!=''">
+                `user_id`=#{userId},
+            </if>
+        </set>
+        <where>
+            <if test="id!=null and id>0">
+                `id`=#{id}
+            </if>
+        </where>
+    </update>
+
+    <delete id="deleteOrder">
+        delete from `order` where id = #{id}
+    </delete>
+
+    <select id="selectOrderById" resultMap="orderMap">
+        select *
+        from `order`
+        where id = #{id}
+    </select>
+    <select id="selectImgByHotelId" resultMap="imgMap">
+        select * from `hotel_image` where hotel_id=#{hotelId}
+    </select>
+    <select id="selectImage" resultMap="imgMap">
+        select * from `hotel_image` limit 6
+    </select>
+    <select id="selectHouseById" resultMap="houseMap">
+        select *
+        from `house` where id = #{id}
+    </select>
+
+    <select id="searchHotel" resultMap="hotelMap">
+        select * from `hotel`
+        <if test="hotelName !=null and hotelName !='' and hotelName.trim().length() > 0">
+            where hotel_name like concat('%', #{hotelName}, '%') or address like concat('%', #{hotelName}, '%')
+        </if>
+        order by score desc
+    </select>
+
+</mapper>

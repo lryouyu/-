@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ysu.dao.UserMapper">
+    <resultMap id="baseMap" type="user">
+        <id column="id" property="id"></id>
+        <result column="username" property="username"></result>
+        <result column="password" property="password"></result>
+        <result column="img_path" property="imgPath"></result>
+        <result column="real_name" property="realName"/>
+        <result column="tel" property="tel"/>
+        <result column="age" property="age"/>
+        <result column="sex" property="sex"/>
+        <result column="card" property="card"/>
+    </resultMap>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into `user`(`username`,`password`,`img_path`,`real_name`,`tel`,`age`,`sex`,`card`)
+        values(#{username},#{password},#{imgPath},#{realName},#{tel},#{age},#{sex},#{card})
+    </insert>
+
+    <select id="selectByUsernameAndPassword" resultMap="baseMap">
+        select `id`,`username`,`password` from `user` where `username`=#{username} and `password`=#{password}
+    </select>
+
+    <select id="selectByUsername" resultMap="baseMap">
+        select `id`,`username`,`password` from `user` where `username` like concat('%', #{keyword}, '%')
+    </select>
+
+    <select id="selectById" resultMap="baseMap">
+        select * from `user` where `id` = #{id}
+    </select>
+
+    <select id="selectList" resultMap="baseMap">
+        select * from `user`;
+    </select>
+    
+    <select id="check" resultMap="baseMap">
+        select *
+        from `user`
+        where real_name = #{realName} and tel =#{tel} and card = #{card} and username =#{username}
+    </select>
+
+    <delete id="deleteById">
+        delete from `user` where id=#{id}
+    </delete>
+    <update id="update">
+        update `user`
+        <set>
+            `sex`=#{sex},
+            <if test="username!=null and username!=''">
+                `username`=#{username},
+            </if>
+            <if test="password!=null and password!=''">
+                `password`=#{password},
+            </if>
+            <if test="imgPath!=null and imgPath!=''">
+                `img_path`=#{imgPath},
+            </if>
+            <if test="realName!=null and realName!=''">
+                `real_name`=#{realName},
+            </if>
+            <if test="tel!=null and tel!=''">
+                `tel`=#{tel},
+            </if>
+            <if test="age!=null and age!=''">
+                `age`=#{age},
+            </if>
+
+            <if test="card!=null and card!=''">
+                `card`=#{card},
+            </if>
+        </set>
+        <where>
+            <if test="id!=null and id>0">
+                `id`=#{id}
+            </if>
+        </where>
+    </update>
+</mapper>

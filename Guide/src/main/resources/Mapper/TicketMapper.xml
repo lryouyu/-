@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ysu.dao.TicketMapper">
+    <resultMap id="ticketMap" type="Ticket">
+        <id column="id" property="id"/>
+        <result column="att_id" property="attId"/>
+        <result column="cost" property="cost"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="att_name" property="attName"/>
+        <result column="count" property="count"/>
+    </resultMap>
+
+    <resultMap id="useTicketMap" type="useTicket">
+        <id column="id" property="id"/>
+        <result column="time" property="time"/>
+        <result column="username" property="username"/>
+        <result column="user_id" property="userId"/>
+        <result column="ticket_id" property="ticketId"/>
+        <result column="use_time" property="useTime"/>
+    </resultMap>
+
+
+    <select id="selectListTicket" resultMap="ticketMap">
+        select * from `ticket`
+    </select>
+    
+    <select id="selectListUseTicket" resultMap="useTicketMap">
+        select * from `use_ticket`
+    </select>
+    <select id="selectTicketsByAttId" resultMap="ticketMap">
+        select * from `ticket` where att_id=#{attId}
+    </select>
+    <select id="selectTicketsByUserId" resultMap="useTicketMap">
+        select * from `use_ticket` where user_id =#{userId}
+    </select>
+    <select id="selectUseTicketByTicketId" resultMap="useTicketMap">
+        select * from `use_ticket` where ticket_id =#{ticketId}
+     </select>
+    
+    <select id="selectTicketById" resultMap="ticketMap">
+        select * from `ticket` where id =#{id}
+    </select>
+    <insert id="insertTicket" useGeneratedKeys="true" keyProperty="id">
+        insert into `ticket`(`att_id`, `cost`, `start_time`, `end_time`, `att_name`, `count`)
+        values ( #{attId}, #{cost}, #{startTime}, #{endTime}, #{attName}, #{count})
+
+    </insert>
+
+    <update id="updateTicket">
+        update `ticket`
+        <set>
+            <if test="attId!=null and attId!=''">
+                `att_id`=#{attId},
+            </if>
+            <if test="cost!=null and cost!=''">
+                `cost`=#{cost},
+            </if>
+            <if test="startTime!=null and startTime!=''">
+                `start_time`=#{startTime},
+            </if>
+            <if test="endTime!=null and endTime!=''">
+                `end_time`=#{endTime},
+            </if>
+            <if test="attName!=null and attName!=''">
+                `att_name`=#{attName},
+            </if>
+            <if test="count!=null and count!=''">
+                `count`=#{count},
+            </if>
+        </set>
+        <where>
+            <if test="id!=null and id>0">
+                `id`=#{id}
+            </if>
+        </where>
+    </update>
+
+    <delete id="deleteTicketById">
+        delete
+        from `ticket`
+        where id= #{id};
+    </delete>
+    <delete id="deleteUseTicketById">
+        delete
+        from `use_ticket`
+        where id= #{id};
+    </delete>
+    <insert id="buyUserTicket" useGeneratedKeys="true" keyProperty="id">
+        insert into `use_ticket`(`username`,`user_id`,`ticket_id`,`use_time`,`time`)
+        values (#{username},#{userId},#{ticketId},#{useTime},#{time})
+    </insert>
+    <select id="selectUseTicketById" resultMap="useTicketMap">
+        select * from `use_ticket` where id =#{id}
+    </select>
+
+</mapper>

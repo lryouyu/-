@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ysu.dao.AdminMapper">
+
+    <resultMap id="adminMap" type="admin">
+        <id column="id" property="id"></id>
+        <result column="username" property="username"></result>
+        <result column="password" property="password"></result>
+    </resultMap>
+    <insert id="insertAdmin" useGeneratedKeys="true" keyProperty="id">
+        insert into `admin`(`username`,`password`)
+        values (#{username},#{password})
+    </insert>
+
+    <delete id="deleteAdminById">
+        delete from `admin` where id= #{id}
+    </delete>
+
+    <update id="updateAdmin">
+        update`admin`
+        <set>
+            <if test="username!=null and username!=''">
+                `username`=#{username},
+            </if>
+            <if test="password!=null and password!=''">
+                `password`=#{password},
+            </if>
+        </set>
+        <where>
+            <if test="id!=null and id>0">
+                `id`=#{id}
+            </if>
+        </where>
+    </update>
+
+    <select id="selectAdminById" resultMap="adminMap">
+        select * from `admin` where id = #{id}
+    </select>
+
+    <select id="selectByUsernameAndPassword" resultMap="adminMap">
+        select * from `admin` where `username`=#{username} and `password`=#{password}
+    </select>
+
+</mapper>

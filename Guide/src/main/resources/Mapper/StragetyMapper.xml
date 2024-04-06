@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ysu.dao.StrategyMapper">
+    <resultMap id="strategyMap" type="strategy">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="type" property="type"/>
+        <result column="introduce" property="introduce"/>
+        <result column="content" property="content"/>
+        <result column="time" property="time"/>
+        <result column="like" property="like"/>
+        <result column="admin_id" property="adminId"/>
+        <result column="warn" property="warn"/>
+        <result column="traffic" property="traffic"/>
+
+    </resultMap>
+
+    <resultMap id="commentMap" type="Comment">
+        <id column="id" property="id"/>
+        <result column="content" property="content"/>
+        <result column="time" property="time"/>
+        <result column="user_id" property="userId"/>
+        <result column="str_id" property="strId"/>
+    </resultMap>
+
+    <insert id="insertStrategy" keyProperty="id" useGeneratedKeys="true">
+        insert into `strategy`(`title`,`type`,`introduce`,`content`,`time`,`like`,`admin_id`,`warn`,`traffic`)
+        values (#{title},#{type},#{introduce},#{content},#{time},#{like},#{adminId},#{warn},#{traffic})
+    </insert>
+    <select id="selectListStrategy" resultMap="strategyMap">
+        select * from `strategy`
+    </select>
+    <select id="selectStrategyTop" resultMap="strategyMap">
+        select * from `strategy` order by  `like` desc limit 10
+    </select>
+
+    <select id="selectByTitle" resultMap="strategyMap">
+        select * from `strategy` where `title` like concat('%', #{title}, '%')
+    </select>
+
+    <select id="selectByType" resultMap="strategyMap">
+        select * from `strategy` where `type` like concat('%', #{type}, '%')
+    </select>
+
+    <select id="selectStrategyById" resultMap="strategyMap">
+        select *
+        from `strategy`
+        where id = #{id}
+    </select>
+
+    <update id="updateStrategy">
+        update `strategy`
+        <set>
+            <if test="title!=null and title!=''">
+                `title`=#{title},
+            </if>
+            <if test="type!=null and type!=''">
+                `type`=#{type},
+            </if>
+            <if test="introduce!=null and introduce!=''">
+                `introduce`=#{introduce},
+            </if>
+            <if test="content!=null and content!=''">
+                `content`=#{content},
+            </if>
+            <if test="traffic!=null and traffic!=''">
+                `traffic`=#{traffic},
+            </if>
+            <if test="warn!=null and warn!=''">
+                `warn`=#{warn},
+            </if>
+            <if test="like!=null and like!=''">
+                `like` =#{like}
+            </if>
+        </set>
+        <where>
+            <if test="id!=null and id>0">
+                `id`=#{id}
+            </if>
+        </where>
+    </update>
+
+    <delete id="deleteStrategyById">
+        delete from `strategy` where id = #{id}
+    </delete>
+
+    <insert id="insertComment" useGeneratedKeys="true" keyProperty="id">
+        insert into `str_comment`(`content`,`time`,`str_id`,`user_id`) values (#{content},#{time},#{strId},#{userId})
+    </insert>
+
+    <delete id="deleteCommentById">
+        delete from `str_comment` where id = #{id}
+    </delete>
+
+    <select id="selectListCommentById" resultMap="commentMap">
+        select * from `str_comment` where str_id = #{strId};
+    </select>
+</mapper>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ysu.dao.BusMapper">
+    <resultMap id="busMap" type="bus">
+        <id column="id" property="id"/>
+        <result column="bus_name" property="busName"/>
+        <result column="start" property="start"/>
+        <result column="end" property="end"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="pathway" property="pathway"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into `bus`(`bus_name`,`start`,`end`,`start_time`,`end_time`,`pathway`)
+        values (#{busName},#{start},#{end},#{startTime},#{endTime},#{pathway})
+    </insert>
+    <select id="selectList" resultMap="busMap">
+        select * from `bus`
+    </select>
+
+    <select id="selectById" resultMap="busMap">
+        select * from `bus` where id =#{id}
+    </select>
+    <select id="selectByName" resultMap="busMap">
+        select * from `bus` where bus_name like concat('%', #{busName}, '%')
+    </select>
+    <select id="selectByStation" resultMap="busMap">
+        select * from `bus` where pathway like concat('%', #{pathway}, '%')
+    </select>
+    <delete id="deleteById">
+        delete from `bus` where id=#{id}
+    </delete>
+    <update id="update">
+        update `bus`
+        <set>
+            <if test="busName!=null and busName!=''">
+                `bus_name`=#{busName},
+            </if>
+            <if test="start!=null and start!=''">
+                `start`=#{start},
+            </if>
+            <if test="end!=null and end!=''">
+                `end`=#{end},
+            </if>
+            <if test="startTime!=null and startTime!=''">
+                `start_time`=#{startTime},
+            </if>
+            <if test="endTime!=null and endTime!=''">
+                `end_time`=#{endTime},
+            </if>
+            <if test="pathway!=null and pathway!=''">
+                `pathway`=#{pathway},
+            </if>
+        </set>
+        <where>
+            <if test="id!=null and id>0">
+                `id`=#{id}
+            </if>
+        </where>
+    </update>
+</mapper>

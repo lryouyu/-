@@ -1,0 +1,217 @@
+<template>
+    <transition name="el-zoom-in-bottom">
+        <div v-show="true" class="transition-box">
+            <el-card class="box-card" >
+                <el-form ref="ruleFormRef" :model="attraction" :rules="rules">
+                    <!--prop的值，表单的key值，rules定义的规则的key值-->
+                    <el-form-item label="景点名称" prop="attName" >
+                        <el-input v-model="attraction.attName" style="width:350px;"></el-input>
+                    </el-form-item>
+                    <el-form-item label="景点地址" prop="address" >
+                        <el-input v-model="attraction.address" style="width:350px;"></el-input>
+                    </el-form-item>
+                    <el-form-item label="官方电话" prop="tel" >
+                        <el-input v-model="attraction.tel" style="width:350px;"></el-input>
+                    </el-form-item>
+                    <el-form-item label="开放时间">
+                        <el-time-select
+                                v-model="attraction.startTime"
+                                start="00:30"
+                                step="00:15"
+                                end="23:30"
+                                placeholder="开放时间"
+                        />
+                        &nbsp&nbsp&nbsp&nbsp&nbsp<el-time-select
+                            v-model="attraction.endTime"
+                            start="00:30"
+                            step="00:15"
+                            end="23:30"
+                            placeholder="关闭时间"
+                    />
+                    </el-form-item>
+                    <el-form-item label="景点介绍" prop="introduce">
+                        &nbsp&nbsp&nbsp<el-input  type="textarea" v-model="attraction.introduce" style="width:350px;" autosize></el-input>
+                    </el-form-item>
+                    <el-form-item label="景点星级" prop="star" >
+                        &nbsp&nbsp&nbsp&nbsp<el-input-number v-model="attraction.star" :min="1" :max="5" style="width:150px;"></el-input-number>
+                    </el-form-item>
+                    <el-form-item label="景点评分" prop="star" >
+                        &nbsp&nbsp&nbsp&nbsp<el-input v-model="attraction.score" style="width:150px;"></el-input>
+                    </el-form-item>
+                    <el-form-item label="服务信息" prop="service">
+                        <el-input type="textarea" v-model="attraction.service" style="width:350px;" autosize></el-input>
+                    </el-form-item>
+
+                    <el-form-item label="点击可更换景点图片">
+                        <el-upload
+                                v-for="imageUrl in imageUrls"
+                                class="avatar-uploader"
+                                name="imageFile"
+                                action="/api/upload/image"
+                                :show-file-list="false"
+                                :on-success="handleAvatarSuccess"
+                                :before-upload="beforeAvatarUpload"
+                                :key="imageUrl.key"
+                                @click="updateurl(imageUrl)"
+                        >
+                            <!--图片回显-->
+                            <img v-if="imageUrl.imgPath" :src="'/'+imageUrl.imgPath" class="avatar" />
+                            <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+                        </el-upload>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button style="margin-top: 12px; margin-left: 200px;" @click="submitForm">确认</el-button>
+                        <el-button style="margin-top: 12px; margin-left: 200px;" @click="cancel">取消</el-button>
+                    </el-form-item>
+                </el-form>
+            </el-card>
+
+        </div>
+    </transition>
+</template>
+
+<script setup>
+
+
+    import {reactive, ref} from "vue";
+    import {ElMessage, ElMessageBox} from "element-plus";
+    import {addAttraction, addImage, updateAttraction, updateImage} from "@/api/attraction";
+    import { Plus } from '@element-plus/icons-vue'
+    import {useRouter} from 'vue-router'
+    let attraction = ref({star:1,attName:null,introduce:null,service:null,tel:null,address:null,startTime:"08:30",endTime:"21:30",score:null});
+    const imageUrls = ref([
+        {key:1,imgPath:null,attId:null},{key:2,imgPath:null,attId:null},
+        {key:3,imgPath:null,attId:null},{key:4,imgPath:null,attId:null},
+        {key:5,imgPath:null,attId:null},{key:6,imgPath:null,attId:null},
+        {key:7,imgPath:null,attId:null},{key:8,imgPath:null,attId:null},
+        {key:9,imgPath:null,attId:null},{key:10,imgPath:null,attId:null}
+    ]);
+
+    const imgId=ref();
+    const router = useRouter();
+    const updateurl = (imageUrl) => {
+        console.log(imageUrl);
+        imgId.value=imageUrl.key;
+    };
+
+    const updateUrls = reactive([])
+
+
+    const handleAvatarSuccess = (response,event) => {
+        //图片上传成功的图片 要接收返回值，设置回显图片路径imageUrl
+        for (let i=0; i< 10;i++){
+            if (imgId.value==imageUrls.value[i].key){
+                imageUrls.value[i].imgPath = response.data;
+                updateUrls.push(imageUrls.value[i])
+            }
+        }
+        console.log(updateUrls)
+    };
+    const beforeAvatarUpload= (rawFile) => {
+        console.log(rawFile.size)
+        if (rawFile.type !== 'image/jpeg') {
+            ElMessage.error('Avatar picture must be JPG format!')
+            console.log("执行1")
+            return false
+        }
+        if (rawFile.size > 1048576) {
+            ElMessage.error('Avatar picture size can not exceed 2MB!')
+            console.log("执行2")
+            return false
+        }
+        return true
+    }
+
+    const rules = reactive({
+        attName: [
+            {required: true, message: '景点名不能为空', trigger: 'blur'}
+        ],
+        introduce: [
+            {required: true, message: '景点介绍不能为空', trigger: 'blur'},
+            {min: 0, max: 200, message: '景点介绍最多不能超过200字', trigger: "blur"}
+        ],
+        service: [
+            {required: true,message: '服务信息不能为空',trigger: 'blur'},
+            {min: 0, max: 200, message: '服务信息最多不超过200字', trigger: "blur"}
+        ],
+        tel: [
+            {required: true, message: '官方电话不能为空', trigger: 'blur'}
+        ],
+        address: [
+            {required: true, message: '景点地址不能为空', trigger: 'blur'}
+        ],
+
+    });
+    const submitForm = () => {
+        ElMessageBox.confirm(
+            '新增该景点，要继续吗',
+            '警告',
+            {
+                confirmButtonText: '确认',
+                cancelButtonText: '取消',
+                type: 'warning',
+            }
+        )
+            .then(() => {
+                ElMessage({
+                    type: 'success',
+                    message: '添加完成',
+                })
+                console.log(111)
+                addAttraction(attraction.value).then(
+                    (response)=>{
+                        let attractionId = response.data.id;
+                    for (let i = 0; i < updateUrls.length;i++){
+                        updateUrls[i].attId = attractionId;
+                        addImage(updateUrls[i])
+                    }
+                })
+                router.push({name: 'attraction'});
+            })
+            .catch(() => {
+                ElMessage({
+                    type: 'info',
+                    message: '取消更新',
+                })
+            })
+
+    };
+    const cancel = () => {
+        router.push({name: 'attraction'});
+    };
+</script>
+
+<style scoped>
+
+    .transition-box {
+        background-color: white;
+        height: 600px;
+        border-radius: 10px;
+    }
+    .avatar {
+        width: 178px;
+        height: 178px;
+        display: block;
+    }
+    .avatar-uploader {
+        border: 1px dashed var(--el-border-color);
+        border-radius: 6px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        transition: var(--el-transition-duration-fast);
+    }
+
+    .avatar-uploader .el-upload:hover {
+        border-color: var(--el-color-primary);
+    }
+
+    .el-icon.avatar-uploader-icon {
+        font-size: 28px;
+        color: #8c939d;
+        width: 178px;
+        height: 178px;
+        text-align: center;
+    }
+
+</style>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ysu.dao.FoodMapper">
+    <resultMap id="foodMap" type="food">
+        <id column="id" property="id"/>
+        <result column="food_name" property="foodName"/>
+        <result column="content" property="content"/>
+        <result column="att_name" property="attName"/>
+    </resultMap>
+    <resultMap id="imgMap" type="FoodImage">
+        <id column="id" property="id"/>
+        <result column="img_path" property="imgPath"/>
+        <result column="food_id" property="foodId"/>
+    </resultMap>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into `food`(`food_name`,`content`,`att_name`)
+        values (#{foodName},#{content},#{attName})
+    </insert>
+
+    <insert id="insertImage" useGeneratedKeys="true" keyProperty="id">
+        insert into `food_image`(`img_path`,`food_id`)
+        values (#{imgPath},#{foodId})
+    </insert>
+
+    <delete id="deleteById">
+        delete from `food` where id=#{id}
+    </delete>
+
+    <select id="selectList" resultMap="foodMap">
+        select * from `food`
+    </select>
+
+    <select id="selectImageById" resultMap="imgMap">
+        select * from `food_image` where food_id =#{foodId}
+    </select>
+
+    <select id="selectListByAtt" resultMap="foodMap">
+        select * from `food` where att_name=#{attName}
+    </select>
+    <update id="update">
+        update `food`
+        <set>
+            <if test="foodName!=null and foodName!=''">
+                `food_name`=#{foodName},
+            </if>
+            <if test="content!=null and content!=''">
+                `content`=#{content},
+            </if>
+            <if test="attName!=null and attName!=''">
+                `att_name`=#{attName},
+            </if>
+        </set>
+        <where>
+            <if test="id!=null and id>0">
+                `id`=#{id}
+            </if>
+        </where>
+    </update>
+
+    <update id="updateImage">
+        update `food_image`
+        <set>
+            <if test="imgPath!=null and imgPath!=''">
+                `img_path`=#{imgPath},
+            </if>
+        </set>
+        <where>
+            `id`=#{id}
+        </where>
+    </update>
+
+    <select id="selectByName" resultMap="foodMap">
+        select * from `food`
+        <if test="foodName!=null and foodName!=''">
+            where food_name like concat('%', #{foodName}, '%')
+        </if>
+
+    </select>
+    <select id="selectByAttName" resultMap="foodMap">
+        select * from `food`
+        <if test="attName!=null and attName!=''">
+            where att_name like concat('%', #{attName}, '%')
+        </if>
+
+    </select>
+    <select id="selectById" resultMap="foodMap">
+        select * from `food` where id = #{id}
+    </select>
+</mapper>

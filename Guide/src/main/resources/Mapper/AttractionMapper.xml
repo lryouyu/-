@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ysu.dao.AttractionMapper">
+    <resultMap id="baseMap" type="Attraction">
+        <id column="id" property="id"/>
+        <result column="att_name" property="attName"/>
+        <result column="introduce" property="introduce"/>
+        <result column="star" property="star"/>
+        <result column="service" property="service"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="tel" property="tel"/>
+        <result column="score" property="score"/>
+    </resultMap>
+    <resultMap id="imgMap" type="AttractionImage">
+        <id column="id" property="id"/>
+        <result column="img_path" property="imgPath"/>
+        <result column="att_id" property="attId"/>
+    </resultMap>
+    <resultMap id="commentMap" type="Comment">
+        <id column="id" property="id"/>
+        <result column="content" property="content"/>
+        <result column="time" property="time"/>
+        <result column="att_id" property="strId"/>
+        <result column="user_id" property="userId"/>
+    </resultMap>
+    <resultMap id="ticketMap" type="Ticket">
+        <id column="id" property="id"/>
+        <result column="time" property="time"/>
+        <result column="att_id" property="attId"/>
+        <result column="cost" property="cost"/>
+        <result column="user_id" property="userId"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+    </resultMap>
+
+    <select id="selectList" resultMap="baseMap">
+        select * from `attraction`
+    </select>
+    <select id="selectComment" resultMap="commentMap">
+        select `id`,`content`,`time`,`user_id`,`att_id` from att_comment where att_id=#{id}
+    </select>
+    <select id="selectImgByAttId" resultMap="imgMap">
+        select * from `att_image` where att_id=#{attId} and img_path is not null
+    </select>
+
+    <delete id="deleteAttractionById" >
+        delete from `attraction` where id = #{id}
+    </delete>
+
+    <delete id="deleteCommentById">
+        delete
+        from `att_comment`
+        where id=#{id};
+    </delete>
+
+    <update id="updateImage">
+        update `att_image`
+        <set>
+            <if test="imgPath!=null and imgPath!=''">
+                `img_path`=#{imgPath},
+            </if>
+        </set>
+            <where>
+                `id`=#{id}
+            </where>
+    </update>
+
+    <select id="selectByName" resultMap="baseMap">
+        select * from `attraction`
+        <if test="attName!=null and attName!=''">
+            where att_name like concat('%', #{attName}, '%') or address like concat('%', #{attName}, '%')
+        </if>
+
+    </select>
+
+    <insert id="insertComment" useGeneratedKeys="true" keyProperty="id">
+        insert into `att_comment`(`content`,`time`,`att_id`,`user_id`) values (#{content},#{time},#{strId},#{userId})
+    </insert>
+    <select id="selectById" resultMap="baseMap">
+        select * from `attraction` where `id`=#{id}
+    </select>
+
+    <select id="ticketCount" resultMap="ticketMap">
+        select * from `ticket` where att_id=#{id} and `time` is NULL
+    </select>
+    
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into `attraction` (`att_name`,`introduce`,`star`,`service`,`start_time`,`end_time`,`address`,`tel`,`score`)
+        values (#{attName},#{introduce},#{star},#{service},#{startTime},#{endTime},#{address},#{tel},#{score})
+    </insert>
+
+    <insert id="insertImage" useGeneratedKeys="true" keyProperty="id">
+        insert into `att_image`(`img_path`,`att_id`)
+        values (#{imgPath},#{attId})
+    </insert>
+
+    <update id="update">
+        update attraction
+        <set>
+            <if test="attName!=null and attName!=''">
+                att_name=#{attName},
+            </if>
+            <if test="introduce!=null and introduce!=''">
+                `introduce`=#{introduce},
+            </if>
+            <if test="star!=null and star!=''">
+                `star`=#{star},
+            </if>
+            <if test="service!=null and service!=''">
+                `service`=#{service},
+            </if>
+            <if test="tel!=null and tel!=''">
+                `tel`=#{tel},
+            </if>
+            <if test="startTime!=null and startTime!=''">
+                `start_time`=#{startTime},
+            </if>
+            <if test="endTime!=null and endTime!=''">
+                `end_time`=#{endTime},
+            </if>
+            <if test="address!=null and address!=''">
+                `address`=#{address},
+            </if>
+            <if test="score!=null and score!=''">
+                `score`=#{score},
+            </if>
+        </set>
+        <where>
+            <if test="id!=null and id>0">
+                `id`=#{id}
+            </if>
+        </where>
+    </update>
+    <select id="selectImage" resultMap="imgMap">
+        select * from `att_image` limit 6
+    </select>
+</mapper>

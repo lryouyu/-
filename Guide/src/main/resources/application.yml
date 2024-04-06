@@ -1,0 +1,29 @@
+server:
+  port: 8081
+  servlet:
+    session:
+      cookie:
+        http-only: false
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/guide?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+  redis:
+    #数据库(默认0-15)
+    database: 1
+    #redis域名或者ip
+    host: 127.0.0.1
+    #redis密码
+    password: 123456
+mybatis:
+  #指定Mapper映射文件的位置
+  mapper-locations: "classpath:mapper/*Mapper.xml"
+  #配置mybatis的别名
+  type-aliases-package: com.ysu.entity
+logging:
+  level:
+    #写自己的程序包 日志级别是debug，这样控制台就可以打印debug信息
+    com.ysu: debug
+
